@@ -1,0 +1,48 @@
+{{ userMessage }}
+
+<form method="post" action="/admin/aliases">
+  <div class="form-row" style="padding: 30px 0;">
+    <div class="col-sm-3">
+      <input type="text" class="form-control" id="new_alias" name="new_alias" placeholder="e.g. bob">
+    </div>
+    <div class="col-sm-3">
+      <select class="form-control" id="domain_id" name="domain_id" placeholder="Select a domain">
+        {{#each domains}}
+          <option value="{{this.id}}">{{this.domain}}</option>
+        {{/each}}
+      </select>
+    </div>  
+    <div class="col-sm-3">
+      <select class="form-control" id="user_id" name="user_id" placeholder="Select a user">
+        {{#each users}}
+        <option value="{{this.id}}">{{this.username}}@{{this.domain.domain}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="col-sm-1">
+      <button type="submit" class="btn btn-primary" name="action" value="add">Add Alias</button>
+    </div>
+  </div>
+</form>
+
+<form method="post" action="/admin/aliases">
+  <button class="btn btn-danger" name="action" type="submit" value="delete" style="margin: 20px;">Delete Alias(s)</button>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">Select</th>
+        <th scope="col">Alias</th>
+        <th scope="col">User</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each aliases }}
+      <tr>
+        <td><input type="checkbox" name="id[]" value="{{this.id}}"></td>
+        <td>{{this.alias}}@{{this.domain.domain}}</td>
+        <td>{{#each this.users}}{{this.username}}@{{this.domain.domain}}<br/>{{/each}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</form>

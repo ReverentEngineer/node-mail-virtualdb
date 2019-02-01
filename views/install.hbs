@@ -1,0 +1,16 @@
+<form method="post" action="/install">
+  <div class="form-group">
+    <label for="uri">Connection URI</label>
+    <input type="text" class="form-control" id="uri" name="uri" value="sqlite:/var/lib/mail/mail.db">
+  </div>
+  <div class="form-group">
+    <label for="username">Admin Username</label>
+    <input type="text" class="form-control" id="username" name="username">
+  </div>
+  <div class="form-group">
+    <label for="password">Admin Password</label>
+    <input type="password" class="form-control" id="password" name="password">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Install</button>
+</form>
