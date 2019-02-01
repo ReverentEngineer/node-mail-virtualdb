@@ -1,14 +1,14 @@
 {
-  "name": "mini-mail-server",
+  "name": "mail-virtual-db",
   "version": "1.0.0",
-  "description": "A miniature mail server database manager",
+  "description": "A database for management of virtual users and domains for use with Dovecot and Postfix",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/ReverentEngineer/node-mini-mail-server.git"
+    "url": "git+ssh://git@github.com/ReverentEngineer/node-mail-virtualdb.git"
   },
   "keywords": [
     "mail"
@@ -16,11 +16,11 @@
   "author": "Jeffrey Hill <jeff@reverentengineer.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ReverentEngineer/node-mini-mail-server/issues"
+    "url": "https://github.com/ReverentEngineer/node-mail-virtualdb/issues"
   },
-  "homepage": "https://github.com/ReverentEngineer/node-mini-mail-sererver#readme",
+  "homepage": "https://github.com/ReverentEngineer/node-mail-virtualdb#readme",
   "bin": {
-    "mini-mail-server": "./bin/www"
+    "mail-virtualdb": "./bin/www"
   },
   "dependencies": {
     "child_process": "^1.0.2",
