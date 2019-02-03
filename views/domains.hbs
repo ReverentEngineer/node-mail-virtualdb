@@ -18,6 +18,7 @@
     <tr>
       <th scope="col">Select</th>
       <th scope="col">Domain</th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
@@ -25,6 +26,7 @@
     <tr>
       <td><input type="checkbox" name="id[]" value="{{this.id}}"></td>
       <td>{{this.domain}}</td>
+      <td><a href="/admin/dkim?id={{this.id}}">Download DKIM record</a></td>
     </tr>
     {{/each}}
   </tbody>

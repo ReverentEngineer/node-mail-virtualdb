@@ -2,20 +2,21 @@ var express = require('express');
 var async = require('async');
 var router = express.Router();
 var password_hash = require('../models/password')
+var execSync = require('child_process').execSync;
 
 router.use(function (req, res, next) {
     if ('db' in req.app.locals) {
-        if (req.isAuthenticated())
+        if (req.isAuthenticated()) {
             return next();
-        else
-            res.redirect('/login')
+         } else {
+            return res.redirect('/login')
+         }
     } else {
         return res.redirect('/install');
     }
 });
 
 function userView (req, res) {
-    console.log(req.app.locals)
     const db = req.app.locals.db;
     async.parallel({ 
         users: function (callback) {
@@ -68,6 +69,36 @@ router.get('/domains', function (req, res) {
     });
 });
 
+function privateToDKIM(selector, privateKey) {
+    var pubkey = execSync('openssl rsa -pubout', { input: privateKey })
+    var lines = pubkey.toString('ascii').split('\n')
+    lines.splice(lines.length-2, 2);
+    lines.splice(0, 1);
+    for (var i = 0; i < lines.length; i++) {
+        lines[i] = '"' + lines[i] + '"'
+    }
+    var result = lines.join('\n');
+    result = selector + '._domainkey 14400 IN TXT ("v=DKIM1; k=rsa; p="\n' + result
+    result = result + " )"
+    return result
+}
+
+router.get('/dkim', function (req, res) {
+    const db = req.app.locals.db;
+    db.Domain.findOne({ where: { id: req.query.id} })
+        .then(domain => {
+            if (domain) {
+                var selector = domain.selector;
+                var privKey = Buffer.from(domain.dkim_key, 'base64').toString('ascii');
+                res.setHeader('Content-disposition', 'attachment; filename=txt-record-' + domain.domain + '.txt');
+                res.set('Content-Type', 'text/plain');
+                res.status(200).send(privateToDKIM(selector, privKey))
+            } else {
+                res.status(404).send();
+            }
+        });
+});
+
 router.post('/domains',function (req, res) {
     const db = req.app.locals.db;
     if (req.body.action == "add") {
@@ -86,7 +117,7 @@ router.post('/domains',function (req, res) {
                 });
             });
         db.Domain.destroy({ where: { id: req.body.id }});
-    }
+    } 
     return res.redirect('/admin/domains');
 });
 

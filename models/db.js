@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const execSync = require('child_process').execSync;
 
 function initialize(uri) {
     const sequelize = new Sequelize(uri)
@@ -70,6 +71,16 @@ function initialize(uri) {
                     args: /^[a-z0-9.]+$/i,
                     msg: "Invalid name provided."
                 }
+            }
+        },
+        selector: {
+            type: Sequelize.STRING,
+            defaultValue: 'mail'
+        },
+        dkim_key: {
+            type: Sequelize.STRING,
+            defaultValue: function () {
+                return execSync('openssl genrsa 1024').toString('base64')
             }
         }
     });
