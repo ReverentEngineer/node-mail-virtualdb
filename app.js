@@ -38,7 +38,7 @@ const local = new LocalStrategy((username, password, done) => {
     } else {
         var user = username.split('@')[0]
         var domain = username.split('@')[1]
-        db.User.findOne({ where: {username: user}, include: [{ model: app.locals.db.Domain, where: { domain: domain }}] }).then(user => {
+        db.User.findOne({ where: {username: user}, include: [{ model: app.locals.db.Domain, attributes: [ 'domain' ], where: { domain: domain }}] }).then(user => {
             if (user) {
                 password_check(password, user.password, (err, valid) => {
                     if (err) {
