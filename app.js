@@ -78,20 +78,19 @@ passport.serializeUser(serialize);
 passport.deserializeUser(deserialize);
 
 
-function setSessionSecret(err, secret) {
-    if (!err) {
-        app.use(session({ secret: secret, resave: false, saveUninitialized: false })); 
-    } else {
-        randomBytes(16, function(err, buffer) {
-            var secret = buffer.toString('hex')
-            app.use(session({ secret: secret, resave: false, saveUninitialized: false })); 
-            config.write('session_secret', secret);
-        })
+
+function createSession() {
+    var session_secret = null;
+    try {
+        session_secret = config.readSync('session_secret')
+    } catch (err) {
+        session_secret = randomBytes(16).toString('hex')
+        config.write('session_secret', session_secret);
     }
+    return session({ secret: session_secret, resave: false, saveUninitialized: false});
 }
 
-config.read('session_secret', setSessionSecret);
-
+app.use(createSession());
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash());

@@ -13,6 +13,12 @@ function read(key, callback) {
     });
 }
 
+function readSync(key) {
+    var data = fs.readFileSync(config_path);
+    const config = JSON.parse(data)
+    return config[key]
+}
+
 function write(key, value) {
     return fs.readFile(config_path, (err, data) => {
         var config = {}
@@ -27,4 +33,5 @@ function write(key, value) {
 }
 
 module.exports.read = read;
+module.exports.readSync = readSync;
 module.exports.write = write;
