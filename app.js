@@ -8,81 +8,29 @@ const passport     = require('passport');
 const exphbs       = require('express-handlebars');
 const session      = require('express-session');
 const flash        = require('connect-flash');
-const initializeDb = require('./models/db').initialize;
-const password_check = require('./models/password').check;
-const config = require('./models/config');
+const config       = require('config');
+const initializeDb = require('./models/db');
+
 var app = express();
 
-function initialize(err, uri) {
-    if (!err) {
-        initializeDb(uri)
-            .then(db => {
-                app.locals.db = db;
-            });
-    } else {
-        console.log('No config file found');
-    }
-}
+const databaseUri = config.get('database.uri');
 
-config.read('connection_uri', initialize); 
-
-const LocalStrategy = require("passport-local").Strategy;
-const local = new LocalStrategy((username, password, done) => {
-    const db = app.locals.db;
-    if (username.indexOf("@") == -1) {
-        done(null, null);
-    } else {
-        var user = username.split('@')[0]
-        var domain = username.split('@')[1]
-        db.User.findOne({ where: {username: user}, include: [{ model: app.locals.db.Domain, attributes: [ 'domain' ], where: { domain: domain }}] }).then(user => {
-            if (user) {
-                password_check(password, user.password, (err, valid) => {
-                    if (err) {
-                        throw err
-                    } else if (valid) {
-                        return done(null, { id: user.id, name: username, admin: user.admin });
-                    } else {
-                        return done(null, null);
-                    }
-                });
-            } else {
-                return done(null, null);
-            }
-        });
-    }
-});
-
-
-function serialize(user, done) {
-    done(null, user.id);
-}
-
-function deserialize(id, done) {
-    const db = app.locals.db;
-    db.User.findById(id).then(user => {
-        if (user) {
-            return done(null, { id: user.id, name: user.mail, admin: user.admin });
-        } else {
-            return done(null, null);
-        }
+initializeDb(databaseUri)
+    .then(db => {
+        app.locals.db = db;
     });
-};
 
+const localAuth = require('./models/localAuth')(app);
 
-passport.use("local", local);
-passport.serializeUser(serialize);
-passport.deserializeUser(deserialize);
+passport.use("local", localAuth.strategy);
+passport.serializeUser(localAuth.serialize);
+passport.deserializeUser(localAuth.deserialize);
 
 
 
 function createSession() {
     var session_secret = null;
-    try {
-        session_secret = config.readSync('session_secret')
-    } catch (err) {
-        session_secret = randomBytes(16).toString('hex')
-        config.write('session_secret', session_secret);
-    }
+    session_secret = randomBytes(16).toString('hex')
     return session({ secret: session_secret, resave: false, saveUninitialized: false});
 }
 
@@ -103,11 +51,34 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/login', require('./routes/login'));
-app.use('/admin', require('./routes/admin'));
 app.use('/install', require('./routes/install'));
+
+function unauthorized(req, res) {
+    return res.status(401).render('login', { login: true, message: 'Unauthorized access. Please sign in first.' });
+}
+
+app.use(function (req, res, next) {
+    const db = req.app.locals.db;
+    db.User.count({})
+        .then(c => {
+            if (c > 0) {
+                if (req.isAuthenticated()) {
+                    return next();
+                } else {
+                    return unauthorized(req, res);
+                }    
+            } else {
+                res.redirect("/install");
+            }
+        });
+
+});
+
 app.get('/', function (req, res) {
     res.redirect('/admin/');
 });
+
+app.use('/admin', require('./routes/admin'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

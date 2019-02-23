@@ -93,4 +93,4 @@ function initialize(uri) {
         });
 }
 
-module.exports.initialize = initialize;
+module.exports = initialize;

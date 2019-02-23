@@ -18,7 +18,7 @@ router.use(function (req, res, next) {
 
 function userView (req, res) {
     const db = req.app.locals.db;
-    db.findAll({})
+    db.User.findAll({})
         .then(users => {
             return res.render('users', { users: users });
         });
@@ -84,12 +84,6 @@ router.post('/domains',function (req, res) {
     if (req.body.action == "add") {
         db.Domain.create({ domain: req.body.domain });
     } else if (req.body.action == "delete") {
-        db.User.findAll({ include: [{ model: db.Domain, where: { id: req.body.id }}]})
-            .then(users => {
-                users.forEach( function (user) {
-                    user.destroy();
-                });
-            });
         db.Alias.findAll({ include: [{ model: db.Domain, where: { id: req.body.id }}]})
             .then(aliases => {
                 aliases.forEach( function (alias) {
@@ -107,13 +101,13 @@ function aliasView (req, res) {
     const db = req.app.locals.db;
     async.parallel({ 
         aliases: function (callback) {
-            db.Alias.findAll({ include: [db.Domain, { model: db.User, include: [db.Domain]}] })
+            db.Alias.findAll({ include: [db.Domain] })
                 .then(aliases =>{
                     callback(null, aliases);
                 });
         },
         users: function(callback) {
-            db.User.findAll({ include: [db.Domain] })
+            db.User.findAll({ })
                 .then(users => {
                     callback(null, users);
                 });
