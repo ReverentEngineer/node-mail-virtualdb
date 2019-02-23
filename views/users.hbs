@@ -6,13 +6,6 @@
       <input type="text" class="form-control" id="new_username" name="new_username" placeholder="e.g. bob">
     </div>
     <div class="col-sm-3">
-      <select class="form-control" id="domain_id" name="domain_id" placeholder="Select a domain">
-        {{#each domains}}
-          <option value="{{this.id}}">{{this.domain}}</option>
-        {{/each}}
-      </select>
-    </div> 
-    <div class="col-sm-3">
       <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Password">
     </div>
  
@@ -29,7 +22,6 @@
       <tr>
         <th scope="col">Select</th>
         <th scope="col">Username</th>
-        <th scope="col">Domain</th>
       </tr>
     </thead>
     <tbody>
@@ -37,7 +29,6 @@
       <tr>
         <td><input type="checkbox" name="id[]" value="{{this.id}}"></td>
         <td>{{this.username}}</td>
-        <td>{{this.domain.domain}}</td>
       </tr>
       {{/each}}
     </tbody>
