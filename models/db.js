@@ -15,7 +15,8 @@ function initialize(uri) {
             is: {
                 args: /^[a-z0-9.]+$/i,
                 msg: 'Invalid username.'
-            }
+            },
+            unique: true
         },
         password: {
             type: Sequelize.STRING
@@ -24,13 +25,6 @@ function initialize(uri) {
             type: Sequelize.BOOLEAN,
             defaultValue: false
         }
-    }, {
-        indexes: [
-            {
-                unique: true,
-                fields: ['username', 'domainId']
-            }
-        ]
     });
 
     const Alias = sequelize.define('alias', {
@@ -85,7 +79,6 @@ function initialize(uri) {
         }
     });
 
-    User.belongsTo(Domain);
     Alias.belongsTo(Domain);
     Alias.belongsToMany(User, { through: 'UserAliases' });
 
