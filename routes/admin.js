@@ -96,12 +96,11 @@ router.post('/domains',function (req, res) {
 });
 
 
-
 function aliasView (req, res) {
     const db = req.app.locals.db;
     async.parallel({ 
         aliases: function (callback) {
-            db.Alias.findAll({ include: [db.Domain] })
+            db.Alias.findAll({ include: [db.Domain, db.User] })
                 .then(aliases =>{
                     callback(null, aliases);
                 });
