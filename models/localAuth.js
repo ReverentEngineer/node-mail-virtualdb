@@ -27,7 +27,7 @@ module.exports = function (app) {
     }
 
     function deserialize(id, done) {
-        db.User.findOne({ id: id }).then(user => {
+        db.User.findOne({ where: { id: id } }).then(user => {
             if (user) {
                 return done(null, { id: user.id, name: user.username, admin: user.admin });
             } else {
