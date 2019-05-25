@@ -40,7 +40,7 @@
       <tr>
         <td><input type="checkbox" name="id[]" value="{{this.id}}"></td>
         <td>{{this.alias}}@{{this.domain.domain}}</td>
-        <td>{{#each this.users}}{{this.username}}@{{this.domain.domain}}<br/>{{/each}}</td>
+        <td>{{#each this.users}}{{this.username}}{{/each}}</td>
       </tr>
       {{/each}}
     </tbody>
