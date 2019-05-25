@@ -1,6 +1,6 @@
 {
   "name": "mail-virtualdb",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A database for management of virtual users and domains for use with Dovecot and Postfix",
   "main": "index.js",
   "scripts": {
