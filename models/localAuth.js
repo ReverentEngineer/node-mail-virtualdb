@@ -1,10 +1,10 @@
 const passport      = require('passport');
 const LocalStrategy = require("passport-local").Strategy;
 const verify        = require('./password').check;
+const db            = require('../models/db')
 
 module.exports = function (app) {
     const strategy = new LocalStrategy((username, password, done) => {
-        const db = app.locals.db;
         db.User.findOne({ where: {username: username} }).then(user => {
             if (user) {
                 verify(password, user.password, (err, valid) => {
@@ -27,8 +27,7 @@ module.exports = function (app) {
     }
 
     function deserialize(id, done) {
-        const db = app.locals.db;
-        db.User.findById(id).then(user => {
+        db.User.findOne({ id: id }).then(user => {
             if (user) {
                 return done(null, { id: user.id, name: user.mail, admin: user.admin });
             } else {

@@ -9,23 +9,16 @@ const exphbs       = require('express-handlebars');
 const session      = require('express-session');
 const flash        = require('connect-flash');
 const config       = require('config');
-const initializeDb = require('./models/db');
+const db           = require('./models/db');
 
 var app = express();
-
-const databaseUri = config.get('database.uri');
-
-initializeDb(databaseUri)
-    .then(db => {
-        app.locals.db = db;
-    });
+db.initialize();
 
 const localAuth = require('./models/localAuth')(app);
 
 passport.use("local", localAuth.strategy);
 passport.serializeUser(localAuth.serialize);
 passport.deserializeUser(localAuth.deserialize);
-
 
 
 function createSession() {
@@ -57,32 +50,18 @@ function unauthorized(req, res) {
     return res.status(401).render('login', { login: true, message: 'Unauthorized access. Please sign in first.' });
 }
 
-app.use(function (req, res, next) {
-    const db = req.app.locals.db;
-    db.User.count({})
-        .then(c => {
-            if (c > 0) {
-                if (req.isAuthenticated()) {
-                    return next();
-                } else {
-                    return unauthorized(req, res);
-                }    
-            } else {
-                res.redirect("/install");
-            }
-        });
-
-});
-
 app.get('/', function (req, res) {
-    res.redirect('/admin/');
+    return res.render('index');
 });
 
 app.use('/admin', require('./routes/admin'));
 
-// catch 404 and forward to error handler
 app.use(function(req, res, next) {
     next(createError(404));
+});
+
+app.use(function(req, res, next) {
+    next(createError(401));
 });
 
 // error handler

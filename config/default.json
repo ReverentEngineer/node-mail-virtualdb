@@ -1,5 +1,3 @@
 {
-    "database": {
-        "uri": "sqlite://mail.db"
-    }
+    "dbpath": ":memory:"
 }

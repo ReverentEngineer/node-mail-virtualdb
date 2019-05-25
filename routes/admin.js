@@ -3,21 +3,17 @@ var async = require('async');
 var router = express.Router();
 var password_hash = require('../models/password')
 var execSync = require('child_process').execSync;
+const db = require('../models/db')
 
 router.use(function (req, res, next) {
-    if ('db' in req.app.locals) {
-        if (req.isAuthenticated()) {
-            return next();
-        } else {
-            return res.redirect('/login')
-        }
+    if (req.isAuthenticated()) {
+        return next();
     } else {
-        return res.redirect('/install');
+        return res.status(401).send('Unauthenticated');
     }
 });
 
 function userView (req, res) {
-    const db = req.app.locals.db;
     db.User.findAll({})
         .then(users => {
             return res.render('users', { users: users });
@@ -28,7 +24,6 @@ router.get('/', userView);
 router.get('/users', userView);
 
 router.post('/users', function (req, res) {
-    const db = req.app.locals.db;
     if (req.body.action == "add") {
         password_hash.create(req.body.new_password, function (err, hash) {
             db.User.create({ username: req.body.new_username, password: hash });
@@ -41,7 +36,6 @@ router.post('/users', function (req, res) {
 });
 
 router.get('/domains', function (req, res) {
-    const db = req.app.locals.db;
     db.Domain.findAll().then(domains => {
         return res.render('domains', { domains: domains });
     }).catch(error => {
@@ -64,7 +58,6 @@ function privateToDKIM(selector, privateKey) {
 }
 
 router.get('/dkim', function (req, res) {
-    const db = req.app.locals.db;
     db.Domain.findOne({ where: { id: req.query.id} })
         .then(domain => {
             if (domain) {
@@ -80,7 +73,6 @@ router.get('/dkim', function (req, res) {
 });
 
 router.post('/domains',function (req, res) {
-    const db = req.app.locals.db;
     if (req.body.action == "add") {
         db.Domain.create({ domain: req.body.domain });
     } else if (req.body.action == "delete") {
@@ -97,7 +89,6 @@ router.post('/domains',function (req, res) {
 
 
 function aliasView (req, res) {
-    const db = req.app.locals.db;
     async.parallel({ 
         aliases: function (callback) {
             db.Alias.findAll({ include: [db.Domain, db.User] })
@@ -125,7 +116,6 @@ function aliasView (req, res) {
 router.get('/aliases', aliasView);
 
 router.post('/aliases', function (req, res) {
-    const db = req.app.locals.db;
     if (req.body.action == "add") {
         db.Domain.findOne({ where: { id: req.body.domain_id } })
             .then(domain => {
