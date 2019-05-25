@@ -1,17 +1,20 @@
 DOCKER_TAG=reverentengineer/mail-virtualdb
 
-prepare:
+all: build
+
+node_modules:
 	npm install
 
-
-test: prepare
+test: node_modules
 	npm test
 
 build: test
 	docker build -t $(DOCKER_TAG):latest .
 
-deploy: build
-	npm publish
+push: build
 	docker push $(DOCKER_TAG):latest
+
+publish: test
+	npm publish
 
 .PHONY: prepare build test deploy
