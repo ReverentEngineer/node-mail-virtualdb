@@ -1,0 +1,4 @@
+node_modules
+mail.db
+.travis.yml
+npm-debug.log
