@@ -19,15 +19,20 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          {{#if user }}
           {{#if user.admin}}
           <a class="nav-item nav-link" href="/admin/domains">Domain</a>
           <a class="nav-item nav-link" href="/admin/users">Users</a>
           <a class="nav-item nav-link" href="/admin/aliases">Aliases</a>
           {{/if}}
-          {{/if}}
         </div>
       </div>
+      {{#if user}}
+      <span class="navbar-text">
+        Welcome {{user.name}}! <a href="/logout"><button type="submit" class="btn btn-outline-danger navbar-btn login-btn">Log Out</button></a>
+      </span>
+      {{else}}
+      <a href="/login"><button type="submit" class="btn btn-outline-success navbar-btn login-btn">Log In</button></a>
+      {{/if}}
     </nav>
 
     <div class="container">

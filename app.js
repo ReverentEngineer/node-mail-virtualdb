@@ -20,16 +20,14 @@ passport.use("local", localAuth.strategy);
 passport.serializeUser(localAuth.serialize);
 passport.deserializeUser(localAuth.deserialize);
 
-
-function createSession() {
-    var session_secret = null;
-    session_secret = randomBytes(16).toString('hex')
-    return session({ secret: session_secret, resave: false, saveUninitialized: false});
-}
-
-app.use(createSession());
+app.use(session({ secret: randomBytes(16).toString('hex'), resave: false, saveUninitialized: false}));
 app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
+app.use(passport.session()); 
+app.use(function (req, res, next) {
+    res.locals.user = req.user; 
+    console.log(req.user);
+    next();
+});
 app.use(flash());
 
 app.engine('.hbs', exphbs({defaultLayout: 'default', extname: '.hbs'}));
@@ -44,6 +42,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/login', require('./routes/login'));
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
 app.use('/install', require('./routes/install'));
 
 function unauthorized(req, res) {
