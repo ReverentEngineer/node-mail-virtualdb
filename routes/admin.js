@@ -6,10 +6,10 @@ var execSync = require('child_process').execSync;
 const db = require('../models/db')
 
 router.use(function (req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated() && req.user.admin) {
         return next();
     } else {
-        return res.status(401).send('Unauthenticated');
+        return res.status(401).render('error', { message: 'Unauthenticated access. Please login' });
     }
 });
 
@@ -26,7 +26,7 @@ router.get('/users', userView);
 router.post('/users', function (req, res) {
     if (req.body.action == "add") {
         password_hash.create(req.body.new_password, function (err, hash) {
-            db.User.create({ username: req.body.new_username, password: hash });
+            db.User.create({ username: req.body.new_username, password: hash, admin: false });
         });
     } else if (req.body.action == "delete") {
         db.User.destroy({ where: { id: req.body.id } });

@@ -11,7 +11,7 @@ module.exports = function (app) {
                     if (err) {
                         throw err
                     } else if (valid) {
-                        return done(null, { id: user.id, name: username, admin: user.admin });
+                        return done(null, { id: user.id, name: user.username, admin: user.admin });
                     } else {
                         return done(null, null);
                     }
@@ -27,9 +27,9 @@ module.exports = function (app) {
     }
 
     function deserialize(id, done) {
-        db.User.findOne({ id: id }).then(user => {
+        db.User.findOne({ where: { id: id } }).then(user => {
             if (user) {
-                return done(null, { id: user.id, name: user.mail, admin: user.admin });
+                return done(null, { id: user.id, name: user.username, admin: user.admin });
             } else {
                 return done(null, null);
             }
